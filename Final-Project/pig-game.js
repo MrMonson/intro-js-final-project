@@ -9,11 +9,9 @@ GAME RULES:
 
 */
 
-var scores, roundScore, activePlayer;
+var scores, roundScore, activePlayer, gamePlaying; // Global Scope so that I can use it in other scopes and other functions
 
 init();
-
-
 
 // This is one way of interacting with the addEventListener
 //document.querySelector('.btn-roll').addEventListener('click', btn);
@@ -21,53 +19,55 @@ init();
 // you can pass in an anonymous function
 // anonymous function is a function that doesn't have a name so it can NOT be reused, which is what we want in our case.
 document.querySelector('.btn-roll').addEventListener('click', function() {
+    if(gamePlaying) {
+      // 1. Random number
+      var dice = Math.floor(Math.random() * 6) + 1; //Math.random() is a random number generator
 
-    // 1. Random number
-    var dice = Math.floor(Math.random() * 6) + 1; //Math.random() is a random number generator
+      //2. Display the result
+      //
+      var diceDom = document.querySelector('.dice');
+      diceDom.style.display = 'block';
+      diceDom.src ='dice-' + dice + '.png';
 
-    //2. Display the result
-    //
-    var diceDom = document.querySelector('.dice');
-    diceDom.style.display = 'block';
-    diceDom.src ='dice-' + dice + '.png';
+      //3. Update the round score IF the rolled number was NOT a 1
 
-
-
-    //3. Update the round score IF the rolled number was NOT a 1
-
-    if (dice !== 1) {
-      //Add score
-      //Same as: roundScore = roundScore + dice
-      roundScore += dice;
-      document.querySelector('#current-' + activePlayer).textContent = roundScore;
-    } else {
-      //Next Player
-      /*Same as: if(activePlayer === 0) {
-        activePlayer = 1;
-    } else {
-        activePlayer = 0;
-    } */
-      //Next Player
-      nextPlayer();
+      if (dice !== 1) { //if dice is different than 1
+        //Add score
+        //Same as: roundScore = roundScore + dice
+        roundScore += dice;
+        document.querySelector('#current-' + activePlayer).textContent = roundScore;
+      } else {
+        //Next Player
+        /*Same as: if(activePlayer === 0) {
+          activePlayer = 1;
+      } else {
+          activePlayer = 0;
+      } */
+        //Next Player
+        nextPlayer();
+      }
     }
 });
 
 document.querySelector('.btn-hold').addEventListener('click', function() {
-    //1. Add CURRENT score to GLOBAL score
-    scores[activePlayer] += roundScore;
+    if (gamePlaying) {
+      //1. Add CURRENT score to GLOBAL score
+      scores[activePlayer] += roundScore;
 
-    //2. Update the UI
-    document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+      //2. Update the UI
+      document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
 
-    //3. Check if Player won the game
-    if (scores[activePlayer] >= 50) {
-      document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
-      document.querySelector('.dice').style.display = 'none';
-      document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
-      document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
-    } else {
-      //Next Player
-      nextPlayer();
+      //3. Check if Player won the game
+      if (scores[activePlayer] >= 25) {
+        document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
+        document.querySelector('.dice').style.display = 'none';
+        document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
+        document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
+        gamePlaying = false;
+      } else {
+        //Next Player
+        nextPlayer();
+      }
     }
 });
 
@@ -96,7 +96,7 @@ function init() {
     scores = [0,0]; // created array
     roundScore = 0;
     activePlayer = 0; // keeps track of player that is playing
-
+    gamePlaying = true;
     // Targeting css class, using .style.display
     document.querySelector('.dice').style.display = 'none';
 
@@ -111,7 +111,6 @@ function init() {
     document.querySelector('.player-0-panel').classList.remove('active');
     document.querySelector('.player-1-panel').classList.remove('active');
     document.querySelector('.player-0-panel').classList.add('active');
-
 }
 
 
